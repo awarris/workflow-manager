@@ -29,32 +29,32 @@ interface WorkflowStore extends WorkflowState {
   updateNode: (id: string, updates: Partial<WorkflowNode>) => void;
   deleteNode: (id: string) => void;
   setSelectedNode: (id: string | null) => void;
-  
+
   // Gestion des arêtes
   addEdge: (edge: WorkflowEdge) => void;
   updateEdge: (id: string, updates: Partial<WorkflowEdge>) => void;
   deleteEdge: (id: string) => void;
-  
+
   // Gestion des réponses
   addResponse: (nodeId: string, response: Omit<ResponseOption, 'id'>) => void;
   updateResponse: (nodeId: string, responseId: string, updates: Partial<ResponseOption>) => void;
   deleteResponse: (nodeId: string, responseId: string) => void;
-  
+
   // Gestion des conditions
   addCondition: (nodeId: string, condition: Omit<ConditionRule, 'id'>) => void;
   updateCondition: (nodeId: string, conditionId: string, updates: Partial<ConditionRule>) => void;
   deleteCondition: (nodeId: string, conditionId: string) => void;
-  
+
   // Gestion des variables
   addVariable: (variable: Omit<WorkflowVariable, 'id'>) => void;
   updateVariable: (id: string, updates: Partial<WorkflowVariable>) => void;
   deleteVariable: (id: string) => void;
-  
+
   // Mode prévisualisation
   setPreviewMode: (enabled: boolean) => void;
   clearChatMessages: () => void;
   setChatVariable: (name: string, value: any) => void;
-  
+
   // Import/Export
   exportWorkflow: (id: string) => string;
   importWorkflow: (jsonString: string) => void;
@@ -67,6 +67,11 @@ const defaultNodeStyle = {
   borderRadius: 8,
   textColor: '#374151',
   fontSize: 14,
+  padding: 12,
+  boxShadow: true,
+  fontFamily: 'sans' as const,
+  fontWeight: 'normal' as const,
+  textAlign: 'left' as const,
 };
 
 const getNodeDefaults = (type: WorkflowNode['type']) => {
@@ -75,51 +80,51 @@ const getNodeDefaults = (type: WorkflowNode['type']) => {
     end: { label: 'Fin', content: 'Fin de la conversation' },
     text: { label: 'Message texte', content: 'Votre message ici...' },
     paragraph: { label: 'Paragraphe', content: 'Votre paragraphe détaillé ici...' },
-    question: { 
-      label: 'Question', 
+    question: {
+      label: 'Question',
       content: 'Votre question ici ?',
       responses: []
     },
     action: { label: 'Action', content: 'Action à exécuter' },
-    condition: { 
-      label: 'Condition', 
+    condition: {
+      label: 'Condition',
       content: 'Condition logique',
       conditions: []
     },
-    delay: { 
-      label: 'Délai', 
+    delay: {
+      label: 'Délai',
       content: 'Attendre avant de continuer',
       delay: 2000
     },
-    webhook: { 
-      label: 'Webhook', 
+    webhook: {
+      label: 'Webhook',
       content: 'Appel API externe',
       webhookUrl: ''
     },
-    variable: { 
-      label: 'Variable', 
+    variable: {
+      label: 'Variable',
       content: 'Définir une variable',
       variableName: '',
       variableValue: ''
     },
-    media: { 
-      label: 'Média', 
+    media: {
+      label: 'Média',
       content: 'Image, vidéo ou audio',
       mediaUrl: '',
       mediaType: 'image'
     },
-    button: { 
-      label: 'Boutons', 
+    button: {
+      label: 'Boutons',
       content: 'Boutons d\'action',
       buttons: []
     },
-    carousel: { 
-      label: 'Carrousel', 
+    carousel: {
+      label: 'Carrousel',
       content: 'Carrousel d\'éléments',
       carouselItems: []
     }
   };
-  
+
   return defaults[type] || {};
 };
 
@@ -146,14 +151,14 @@ export const useWorkflows = create<WorkflowStore>()(
       loadDefaultWorkflows: () => {
         // On vérifie s'il y a déjà des workflows pour ne pas écraser les données existantes
         if (get().workflows.length === 0) {
-            const defaultWorkflows = [
-              workflowVenteAssurance,
-              workflowSupportTechnique,
-              workflowRecouvrement,
-              workflowProspection
-            ].map(w => parseDates(w as unknown as Workflow)); // On s'assure que les dates sont correctes
-            
-            set({ workflows: defaultWorkflows, currentWorkflow: defaultWorkflows[0]?.id || null });
+          const defaultWorkflows = [
+            workflowVenteAssurance,
+            workflowSupportTechnique,
+            workflowRecouvrement,
+            workflowProspection
+          ].map(w => parseDates(w as unknown as Workflow)); // On s'assure que les dates sont correctes
+
+          set({ workflows: defaultWorkflows, currentWorkflow: defaultWorkflows[0]?.id || null });
         }
       },
 
@@ -347,7 +352,7 @@ export const useWorkflows = create<WorkflowStore>()(
       },
 
       setPreviewMode: (enabled: boolean) => set({ isPreviewMode: enabled, chatMessages: [], chatVariables: {} }),
-      
+
       clearChatMessages: () => set({ chatMessages: [], chatVariables: {} }),
 
       setChatVariable: (name: string, value: any) => set(state => ({ chatVariables: { ...state.chatVariables, [name]: value } })),
@@ -384,7 +389,7 @@ export const useWorkflows = create<WorkflowStore>()(
         if (state) {
           // On s'assure que les chaînes de caractères des dates sont reconverties en objets Date
           state.workflows = state.workflows.map(parseDates);
-          
+
           // Si, après avoir chargé, il n'y a aucun workflow, on charge les modèles par défaut.
           // Cela ne se produit que la toute première fois que l'utilisateur lance l'app.
           if (state.workflows.length === 0) {

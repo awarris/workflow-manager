@@ -1,20 +1,20 @@
 import React from 'react';
 import { Handle, Position, NodeProps } from '@xyflow/react';
 import { WorkflowNode } from '../types/workflow';
-import { 
-  MessageSquare, 
-  FileText, 
-  HelpCircle, 
-  Zap, 
-  Play, 
-  Square, 
-  GitBranch, 
-  Clock, 
-  Webhook, 
-  Variable, 
-  Image, 
-  MousePointer, 
-  MoreHorizontal 
+import {
+  MessageSquare,
+  FileText,
+  HelpCircle,
+  Zap,
+  Play,
+  Square,
+  GitBranch,
+  Clock,
+  Webhook,
+  Variable,
+  Image,
+  MousePointer,
+  MoreHorizontal
 } from 'lucide-react';
 
 const nodeIcons = {
@@ -52,7 +52,7 @@ const nodeColors = {
 export const CustomNode: React.FC<NodeProps<WorkflowNode['data']>> = ({ data, selected, type }) => {
   const Icon = nodeIcons[type as keyof typeof nodeIcons] || MessageSquare;
   const colors = nodeColors[type as keyof typeof nodeColors] || nodeColors.text;
-  
+
   const nodeStyle = {
     backgroundColor: data.style.backgroundColor || colors.bg,
     borderColor: data.style.borderColor || colors.border,
@@ -60,16 +60,19 @@ export const CustomNode: React.FC<NodeProps<WorkflowNode['data']>> = ({ data, se
     borderRadius: data.style.borderRadius,
     color: data.style.textColor || colors.text,
     fontSize: data.style.fontSize,
+    padding: data.style.padding,
+    fontFamily: data.style.fontFamily === 'serif' ? 'serif' : data.style.fontFamily === 'mono' ? 'monospace' : 'sans-serif',
+    fontWeight: data.style.fontWeight,
+    textAlign: data.style.textAlign,
   };
 
-  const hasMultipleOutputs = (data.responses && data.responses.length > 0) || 
-                            (data.conditions && data.conditions.length > 0);
+  const hasMultipleOutputs = (data.responses && data.responses.length > 0) ||
+    (data.conditions && data.conditions.length > 0);
 
   return (
     <div
-      className={`px-4 py-3 shadow-lg border-2 min-w-[180px] max-w-[250px] transition-all duration-200 ${
-        selected ? 'ring-2 ring-blue-500 ring-offset-2' : ''
-      }`}
+      className={`px-4 py-3 shadow-lg border-2 min-w-[180px] max-w-[250px] transition-all duration-200 ${selected ? 'ring-2 ring-blue-500 ring-offset-2' : ''
+        }`}
       style={nodeStyle}
     >
       {type !== 'start' && (
@@ -79,12 +82,12 @@ export const CustomNode: React.FC<NodeProps<WorkflowNode['data']>> = ({ data, se
           className="w-3 h-3 !bg-gray-400 hover:!bg-blue-500 transition-colors"
         />
       )}
-      
+
       <div className="flex items-center gap-2 mb-2">
         <Icon size={16} />
         <span className="font-semibold text-sm truncate">{data.label}</span>
       </div>
-      
+
       {data.content && (
         <div className="text-xs opacity-80 mb-2 line-clamp-2">
           {data.content}

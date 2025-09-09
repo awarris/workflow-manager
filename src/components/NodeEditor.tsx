@@ -1,3 +1,5 @@
+// chemin/vers/le/fichier/workflow-manager/src/components/NodeEditor.tsx
+
 import React, { useState } from 'react';
 import { useWorkflows } from '../hooks/useWorkflows';
 import { ResponseOption, ConditionRule, ButtonOption, CarouselItem } from '../types/workflow';
@@ -32,7 +34,7 @@ export const NodeEditor: React.FC = () => {
     deleteCondition
   } = useWorkflows();
   
-  const [activeTab, setActiveTab] = useState<'basic' | 'responses' | 'conditions' | 'advanced' | 'style'>('basic');
+  const [activeTab, setActiveTab] = useState<'basic' | 'responses' | 'conditions' | 'style'>('basic');
   
   const currentWorkflowData = workflows.find(w => w.id === currentWorkflow);
   const selectedNodeData = currentWorkflowData?.nodes.find(n => n.id === selectedNode);
@@ -95,7 +97,6 @@ export const NodeEditor: React.FC = () => {
     { id: 'basic', label: 'Général', icon: Settings },
     ...(selectedNodeData.type === 'question' ? [{ id: 'responses', label: 'Réponses', icon: MessageSquare }] : []),
     ...(selectedNodeData.type === 'condition' ? [{ id: 'conditions', label: 'Conditions', icon: GitBranch }] : []),
-    { id: 'advanced', label: 'Avancé', icon: Type },
     { id: 'style', label: 'Style', icon: Palette },
   ];
 
@@ -280,183 +281,96 @@ export const NodeEditor: React.FC = () => {
             </div>
           </div>
         )}
-
-        {activeTab === 'advanced' && (
-          <div className="space-y-4">
-            {selectedNodeData.type === 'delay' && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Délai (ms): {selectedNodeData.data.delay || 2000}
-                </label>
-                <input
-                  type="range"
-                  min="500"
-                  max="10000"
-                  step="500"
-                  value={selectedNodeData.data.delay || 2000}
-                  onChange={(e) => handleDataUpdate({ delay: parseInt(e.target.value) })}
-                  className="w-full"
-                />
-              </div>
-            )}
-
-            {selectedNodeData.type === 'webhook' && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  URL du Webhook
-                </label>
-                <input
-                  type="url"
-                  value={selectedNodeData.data.webhookUrl || ''}
-                  onChange={(e) => handleDataUpdate({ webhookUrl: e.target.value })}
-                  placeholder="https://api.example.com/webhook"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-            )}
-
-            {selectedNodeData.type === 'variable' && (
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Nom de la variable
-                  </label>
-                  <input
-                    type="text"
-                    value={selectedNodeData.data.variableName || ''}
-                    onChange={(e) => handleDataUpdate({ variableName: e.target.value })}
-                    placeholder="nom_variable"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Valeur
-                  </label>
-                  <input
-                    type="text"
-                    value={selectedNodeData.data.variableValue || ''}
-                    onChange={(e) => handleDataUpdate({ variableValue: e.target.value })}
-                    placeholder="valeur"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-              </div>
-            )}
-
-            {selectedNodeData.type === 'media' && (
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Type de média
-                  </label>
-                  <select
-                    value={selectedNodeData.data.mediaType || 'image'}
-                    onChange={(e) => handleDataUpdate({ mediaType: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="image">Image</option>
-                    <option value="video">Vidéo</option>
-                    <option value="audio">Audio</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    URL du média
-                  </label>
-                  <input
-                    type="url"
-                    value={selectedNodeData.data.mediaUrl || ''}
-                    onChange={(e) => handleDataUpdate({ mediaUrl: e.target.value })}
-                    placeholder="https://example.com/media.jpg"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
+        
+        {/* === NOUVELLE SECTION DE STYLE === */}
         {activeTab === 'style' && (
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Couleur de fond
-              </label>
-              <input
-                type="color"
-                value={selectedNodeData.data.style.backgroundColor}
-                onChange={(e) => handleStyleUpdate({ backgroundColor: e.target.value })}
-                className="w-full h-10 rounded-md border border-gray-300 cursor-pointer"
-              />
+          <div className="space-y-6">
+            {/* Couleurs */}
+            <div className="grid grid-cols-3 gap-3">
+              <div>
+                <label className="text-xs font-medium text-gray-500">Fond</label>
+                <input type="color" value={selectedNodeData.data.style.backgroundColor} onChange={(e) => handleStyleUpdate({ backgroundColor: e.target.value })} className="w-full h-8 mt-1 rounded border border-gray-300 cursor-pointer"/>
+              </div>
+              <div>
+                <label className="text-xs font-medium text-gray-500">Bordure</label>
+                <input type="color" value={selectedNodeData.data.style.borderColor} onChange={(e) => handleStyleUpdate({ borderColor: e.target.value })} className="w-full h-8 mt-1 rounded border border-gray-300 cursor-pointer"/>
+              </div>
+              <div>
+                <label className="text-xs font-medium text-gray-500">Texte</label>
+                <input type="color" value={selectedNodeData.data.style.textColor} onChange={(e) => handleStyleUpdate({ textColor: e.target.value })} className="w-full h-8 mt-1 rounded border border-gray-300 cursor-pointer"/>
+              </div>
             </div>
 
+            {/* Dimensions */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Couleur de bordure
-              </label>
-              <input
-                type="color"
-                value={selectedNodeData.data.style.borderColor}
-                onChange={(e) => handleStyleUpdate({ borderColor: e.target.value })}
-                className="w-full h-10 rounded-md border border-gray-300 cursor-pointer"
-              />
+              <label className="text-sm font-medium text-gray-700">Dimensions</label>
+              <div className="mt-2 space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-gray-600">Épaisseur bordure</span>
+                  <span className="text-xs font-semibold">{selectedNodeData.data.style.borderWidth}px</span>
+                </div>
+                <input type="range" min="0" max="8" value={selectedNodeData.data.style.borderWidth} onChange={(e) => handleStyleUpdate({ borderWidth: parseInt(e.target.value) })} className="w-full"/>
+                
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-gray-600">Rayon bordure</span>
+                  <span className="text-xs font-semibold">{selectedNodeData.data.style.borderRadius}px</span>
+                </div>
+                <input type="range" min="0" max="24" value={selectedNodeData.data.style.borderRadius} onChange={(e) => handleStyleUpdate({ borderRadius: parseInt(e.target.value) })} className="w-full"/>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-gray-600">Padding</span>
+                  <span className="text-xs font-semibold">{selectedNodeData.data.style.padding}px</span>
+                </div>
+                <input type="range" min="4" max="24" value={selectedNodeData.data.style.padding} onChange={(e) => handleStyleUpdate({ padding: parseInt(e.target.value) })} className="w-full"/>
+              </div>
+            </div>
+            
+            {/* Typographie */}
+            <div>
+              <label className="text-sm font-medium text-gray-700">Typographie</label>
+              <div className="mt-2 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-gray-600">Taille police</span>
+                  <span className="text-xs font-semibold">{selectedNodeData.data.style.fontSize}px</span>
+                </div>
+                <input type="range" min="10" max="24" value={selectedNodeData.data.style.fontSize} onChange={(e) => handleStyleUpdate({ fontSize: parseInt(e.target.value) })} className="w-full"/>
+
+                <select value={selectedNodeData.data.style.fontFamily} onChange={(e) => handleStyleUpdate({ fontFamily: e.target.value })} className="w-full px-2 py-1 text-sm border border-gray-300 rounded">
+                  <option value="sans">Sans-serif</option>
+                  <option value="serif">Serif</option>
+                  <option value="mono">Monospace</option>
+                </select>
+                
+                <select value={selectedNodeData.data.style.fontWeight} onChange={(e) => handleStyleUpdate({ fontWeight: e.target.value })} className="w-full px-2 py-1 text-sm border border-gray-300 rounded">
+                  <option value="normal">Normal</option>
+                  <option value="medium">Medium</option>
+                  <option value="semibold">Semi-bold</option>
+                  <option value="bold">Bold</option>
+                </select>
+
+                <select value={selectedNodeData.data.style.textAlign} onChange={(e) => handleStyleUpdate({ textAlign: e.target.value })} className="w-full px-2 py-1 text-sm border border-gray-300 rounded">
+                  <option value="left">Gauche</option>
+                  <option value="center">Centré</option>
+                  <option value="right">Droite</option>
+                </select>
+              </div>
             </div>
 
+            {/* Effets */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Couleur du texte
-              </label>
-              <input
-                type="color"
-                value={selectedNodeData.data.style.textColor}
-                onChange={(e) => handleStyleUpdate({ textColor: e.target.value })}
-                className="w-full h-10 rounded-md border border-gray-300 cursor-pointer"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Épaisseur bordure: {selectedNodeData.data.style.borderWidth}px
-              </label>
-              <input
-                type="range"
-                min="0"
-                max="8"
-                value={selectedNodeData.data.style.borderWidth}
-                onChange={(e) => handleStyleUpdate({ borderWidth: parseInt(e.target.value) })}
-                className="w-full"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Rayon bordure: {selectedNodeData.data.style.borderRadius}px
-              </label>
-              <input
-                type="range"
-                min="0"
-                max="20"
-                value={selectedNodeData.data.style.borderRadius}
-                onChange={(e) => handleStyleUpdate({ borderRadius: parseInt(e.target.value) })}
-                className="w-full"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Taille police: {selectedNodeData.data.style.fontSize}px
-              </label>
-              <input
-                type="range"
-                min="10"
-                max="24"
-                value={selectedNodeData.data.style.fontSize}
-                onChange={(e) => handleStyleUpdate({ fontSize: parseInt(e.target.value) })}
-                className="w-full"
-              />
+              <label className="text-sm font-medium text-gray-700">Effets</label>
+              <div className="mt-2 flex items-center">
+                <input
+                  type="checkbox"
+                  id="boxShadow"
+                  checked={selectedNodeData.data.style.boxShadow}
+                  onChange={(e) => handleStyleUpdate({ boxShadow: e.target.checked })}
+                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <label htmlFor="boxShadow" className="ml-2 block text-sm text-gray-900">
+                  Activer l'ombre
+                </label>
+              </div>
             </div>
           </div>
         )}

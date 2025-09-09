@@ -22,6 +22,11 @@ export interface WorkflowNode {
       borderRadius: number;
       textColor: string;
       fontSize: number;
+      padding: number;
+      boxShadow: boolean;
+      fontFamily: 'sans' | 'serif' | 'mono';
+      fontWeight: 'normal' | 'medium' | 'semibold' | 'bold';
+      textAlign: 'left' | 'center' | 'right';
     };
   };
 }
