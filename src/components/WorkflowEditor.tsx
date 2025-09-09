@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react'; // Ajout de useState
+import React, { useCallback, useRef, useState } from 'react';
 import {
   ReactFlow,
   Background,
@@ -33,9 +33,11 @@ import {
   Image,
   MousePointer,
   MoreHorizontal,
-  Share2, // Nouvelle icône
-  Copy,   // Nouvelle icône
-  Check   // Nouvelle icône
+  Share2,
+  Copy,
+  Check,
+  GripVertical,
+  X
 } from 'lucide-react';
 
 const nodeTypeOptions = [
@@ -54,6 +56,209 @@ const nodeTypeOptions = [
   { type: 'end', icon: Square, label: 'Fin', color: 'text-red-600', description: 'Fin de conversation' },
 ];
 
+// Composant pour la palette déplaçable
+const DraggableNodePalette = ({ onPublish, onExport, onImport, publishedLink, workflowData, onPreview }) => {
+  const [position, setPosition] = useState({ x: 20, y: 20 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [isMinimized, setIsMinimized] = useState(false);
+  const [copied, setCopied] = useState(false);
+  
+  const paletteRef = useRef(null);
+
+  const handleMouseDown = (e) => {
+    if (e.target.closest('button') || e.target.closest('input')) return;
+    
+    setIsDragging(true);
+    const rect = paletteRef.current.getBoundingClientRect();
+    setDragOffset({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    });
+  };
+
+  const handleMouseMove = useCallback((e) => {
+    if (!isDragging) return;
+    
+    const newX = e.clientX - dragOffset.x;
+    const newY = e.clientY - dragOffset.y;
+    
+    // Limiter le déplacement à l'intérieur de la fenêtre
+    const maxX = window.innerWidth - paletteRef.current.offsetWidth - 10;
+    const maxY = window.innerHeight - paletteRef.current.offsetHeight - 10;
+    
+    setPosition({
+      x: Math.max(10, Math.min(newX, maxX)),
+      y: Math.max(10, Math.min(newY, maxY))
+    });
+  }, [isDragging, dragOffset]);
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  React.useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, [isDragging, handleMouseMove]);
+
+  const handleCopyLink = () => {
+    if (!publishedLink) return;
+    navigator.clipboard.writeText(publishedLink);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  if (isMinimized) {
+    return (
+      <div 
+        className="fixed z-50 bg-white rounded-lg shadow-xl border border-gray-300 p-2 cursor-move transition-all duration-300 hover:shadow-2xl"
+        style={{ left: position.x, top: position.y, width: '40px' }}
+        onMouseDown={handleMouseDown}
+        ref={paletteRef}
+      >
+        <div className="flex flex-col items-center">
+          <GripVertical size={16} className="text-gray-500 mb-1" />
+          <button 
+            onClick={() => setIsMinimized(false)}
+            className="p-1 text-gray-600 hover:text-blue-600 transition-colors"
+            title="Agrandir la palette"
+          >
+            <Plus size={16} />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div 
+      className="fixed z-50 bg-white rounded-xl shadow-2xl border border-gray-300 transition-all duration-300"
+      style={{ left: position.x, top: position.y, width: '320px' }}
+      onMouseDown={handleMouseDown}
+      ref={paletteRef}
+    >
+      {/* Header avec grip et bouton de réduction */}
+      <div className="flex items-center justify-between p-3 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-t-xl">
+        <div className="flex items-center gap-2 cursor-move">
+          <GripVertical size={16} className="text-gray-500" />
+          <h3 className="text-sm font-semibold text-gray-700">Palette des Nœuds</h3>
+        </div>
+        <button 
+          onClick={() => setIsMinimized(true)}
+          className="p-1 text-gray-500 hover:text-gray-700 transition-colors"
+          title="Réduire la palette"
+        >
+          <X size={16} />
+        </button>
+      </div>
+
+      <div className="p-3 max-h-96 overflow-y-auto">
+        {/* Node Types */}
+        <div className="mb-4">
+          <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+            Nœuds disponibles
+          </h4>
+          <div className="grid grid-cols-2 gap-2">
+            {nodeTypeOptions.map(({ type, icon: Icon, label, color, description }) => (
+              <div
+                key={type}
+                draggable
+                onDragStart={(event) => {
+                  event.dataTransfer.setData('application/reactflow', type);
+                  event.dataTransfer.effectAllowed = 'move';
+                }}
+                className={`flex flex-col items-center gap-1 p-2 text-xs bg-gray-50 hover:bg-gray-100 rounded-lg cursor-grab active:cursor-grabbing transition-all hover:shadow-sm ${color}`}
+                title={description}
+              >
+                <Icon size={16} />
+                <span className="text-center leading-tight">{label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        
+        {/* Workflow Stats */}
+        {workflowData && (
+          <div className="mb-4 p-2 bg-gray-50 rounded-lg">
+            <div className="text-sm text-gray-600">
+              <div className="flex items-center gap-2 mb-1">
+                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                <span>{workflowData.nodes.length} nœuds</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <span>{workflowData.edges.length} connexions</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Actions */}
+        <div className="space-y-2">
+          <button
+            onClick={onPreview}
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg transition-all shadow-sm hover:shadow-md"
+          >
+            <Play size={14} />
+            Tester le bot
+          </button>
+          
+          <button
+            onClick={onPublish}
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-lg transition-all shadow-sm hover:shadow-md"
+          >
+            <Share2 size={14} />
+            Publier
+          </button>
+
+          {publishedLink && (
+            <div className="p-2 bg-gray-100 rounded-lg">
+              <label className="text-xs font-medium text-gray-600">Lien de partage :</label>
+              <div className="flex items-center gap-2 mt-1">
+                <input 
+                  type="text" 
+                  readOnly 
+                  value={publishedLink} 
+                  className="flex-1 text-xs bg-white border border-gray-300 rounded px-2 py-1" 
+                />
+                <button onClick={handleCopyLink} className="p-1.5 bg-gray-200 hover:bg-gray-300 rounded transition-colors">
+                  {copied ? <Check size={14} className="text-green-600" /> : <Copy size={14} />}
+                </button>
+              </div>
+            </div>
+          )}
+
+          <div className="flex gap-2 pt-2 border-t border-gray-200">
+            <button
+              onClick={onExport}
+              className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
+              title="Exporter le bot"
+            >
+              <Download size={14} />
+              Exporter
+            </button>
+            <button
+              onClick={onImport}
+              className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
+              title="Importer un bot"
+            >
+              <Upload size={14} />
+              Importer
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export const WorkflowEditor: React.FC = () => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const {
@@ -63,11 +268,11 @@ export const WorkflowEditor: React.FC = () => {
     addNode,
     updateNode,
     deleteNode,
-    addEdge,
+    addEdge: addEdgeToWorkflow,
     setSelectedNode,
     setPreviewMode,
     exportWorkflow,
-    publishWorkflow ,
+    publishWorkflow,
     importWorkflow,
   } = useWorkflows();
 
@@ -75,14 +280,13 @@ export const WorkflowEditor: React.FC = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState(currentWorkflowData?.nodes || []);
   const [edges, setEdges, onEdgesChange] = useEdgesState(currentWorkflowData?.edges || []);
   const [publishedLink, setPublishedLink] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
 
   // Update local state when workflow changes
   React.useEffect(() => {
     if (currentWorkflowData) {
       setNodes(currentWorkflowData.nodes);
       setEdges(currentWorkflowData.edges);
-      // Met à jour le lien publié si il existe déjà
+      // Met à jour le lien publié s'il existe déjà
       if (currentWorkflowData.publishedId) {
         setPublishedLink(`${window.location.origin}/preview/${currentWorkflowData.publishedId}`);
       } else {
@@ -91,20 +295,13 @@ export const WorkflowEditor: React.FC = () => {
     }
   }, [currentWorkflowData, setNodes, setEdges]);
 
-   const handlePublish = () => {
+  const handlePublish = () => {
     if (!currentWorkflow) return;
     const publishedId = publishWorkflow(currentWorkflow);
     if (publishedId) {
       const link = `${window.location.origin}/preview/${publishedId}`;
       setPublishedLink(link);
     }
-  };
-
-  const handleCopyLink = () => {
-    if (!publishedLink) return;
-    navigator.clipboard.writeText(publishedLink);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
   };
 
   const onConnect = useCallback((params: Connection | Edge) => {
@@ -117,9 +314,9 @@ export const WorkflowEditor: React.FC = () => {
       style: { stroke: '#3B82F6', strokeWidth: 2 },
     };
     
-    addEdge(newEdge);
+    addEdgeToWorkflow(newEdge);
     setEdges(eds => addEdge(params, eds));
-  }, [addEdge, setEdges]);
+  }, [addEdgeToWorkflow, setEdges]);
 
   const onNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
     setSelectedNode(node.id);
@@ -213,100 +410,17 @@ export const WorkflowEditor: React.FC = () => {
 
   return (
     <div className="flex-1 flex">
+      {/* Palette déplaçable */}
+      <DraggableNodePalette 
+        onPublish={handlePublish}
+        onExport={handleExport}
+        onImport={handleImport}
+        publishedLink={publishedLink}
+        workflowData={currentWorkflowData}
+        onPreview={() => setPreviewMode(true)}
+      />
+
       <div className="flex-1 relative">
-        {/* Enhanced Toolbar */}
-        <div className="absolute top-4 left-4 z-10 bg-white rounded-xl shadow-lg border border-gray-200 p-3">
-          {/* Node Types */}
-          <div className="mb-4">
-            <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
-              Nœuds disponibles
-            </h4>
-            <div className="grid grid-cols-4 gap-2">
-              {nodeTypeOptions.map(({ type, icon: Icon, label, color, description }) => (
-                <div
-                  key={type}
-                  draggable
-                  onDragStart={(event) => {
-                    event.dataTransfer.setData('application/reactflow', type);
-                    event.dataTransfer.effectAllowed = 'move';
-                  }}
-                  className={`flex flex-col items-center gap-1 p-2 text-xs bg-gray-50 hover:bg-gray-100 rounded-lg cursor-grab active:cursor-grabbing transition-all hover:shadow-sm ${color}`}
-                  title={description}
-                >
-                  <Icon size={16} />
-                  <span className="text-center leading-tight">{label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-          
-          {/* Actions */}
-          <div className="flex gap-2 pt-3 border-t border-gray-200">
-           <div className="flex gap-2">
-              <button
-                onClick={() => setPreviewMode(true)}
-                className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg transition-all shadow-sm hover:shadow-md"
-              >
-                <Play size={14} />
-                Tester
-              </button>
-              <button
-                onClick={handlePublish}
-                className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-lg transition-all shadow-sm hover:shadow-md"
-              >
-                <Share2 size={14} />
-                Publier
-              </button>
-            </div>
-            {publishedLink && (
-              <div className="p-2 bg-gray-100 rounded-lg">
-                <label className="text-xs font-medium text-gray-600">Lien de partage :</label>
-                <div className="flex items-center gap-2 mt-1">
-                  <input 
-                    type="text" 
-                    readOnly 
-                    value={publishedLink} 
-                    className="w-full text-xs bg-white border border-gray-300 rounded px-2 py-1" 
-                  />
-                  <button onClick={handleCopyLink} className="p-1.5 bg-gray-200 hover:bg-gray-300 rounded">
-                    {copied ? <Check size={14} className="text-green-600" /> : <Copy size={14} />}
-                  </button>
-                </div>
-              </div>
-            )}
-            <div className="flex gap-2">
-             <button
-              onClick={handleExport}
-              className="flex items-center gap-2 px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
-              title="Exporter le bot"
-            >
-              <Download size={14} />
-            </button>
-            <button
-              onClick={handleImport}
-              className="flex items-center gap-2 px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
-              title="Importer un bot"
-            >
-              <Upload size={14} />
-            </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Workflow Stats */}
-        <div className="absolute top-4 right-4 z-10 bg-white rounded-lg shadow-lg border border-gray-200 p-3">
-          <div className="text-sm text-gray-600">
-            <div className="flex items-center gap-2 mb-1">
-              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-              <span>{currentWorkflowData.nodes.length} nœuds</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span>{currentWorkflowData.edges.length} connexions</span>
-            </div>
-          </div>
-        </div>
-
         <div ref={reactFlowWrapper} className="w-full h-full">
           <ReactFlow
             nodes={nodes}
@@ -327,7 +441,7 @@ export const WorkflowEditor: React.FC = () => {
               color="#e5e7eb" 
               gap={20} 
               size={1}
-              variant="dots" as any
+              variant="dots"
             />
             <Controls 
               className="!bg-white !border-gray-200 !shadow-lg"
