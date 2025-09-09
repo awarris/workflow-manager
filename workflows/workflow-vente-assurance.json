@@ -1,0 +1,169 @@
+{
+  "id": "workflow-vente-assurance",
+  "name": "Script Vente Assurance Santé",
+  "description": "Script pour un téléconseiller vendant une assurance santé.",
+  "nodes": [
+    {
+      "id": "start-1",
+      "type": "start",
+      "position": { "x": 50, "y": 100 },
+      "data": {
+        "label": "Début",
+        "content": "Démarrage appel commercial",
+        "style": {
+          "backgroundColor": "#ffffff",
+          "borderColor": "#2563eb",
+          "borderWidth": 2,
+          "borderRadius": 8,
+          "textColor": "#2563eb",
+          "fontSize": 14
+        }
+      }
+    },
+    {
+      "id": "intro-1",
+      "type": "text",
+      "position": { "x": 300, "y": 100 },
+      "data": {
+        "label": "Introduction",
+        "content": "Bonjour, je suis [NOM] de [ENTREPRISE]. Nous aidons nos clients à réduire leurs frais médicaux grâce à une assurance santé flexible.",
+        "style": {
+          "backgroundColor": "#f0f9ff",
+          "borderColor": "#0284c7",
+          "borderWidth": 2,
+          "borderRadius": 8,
+          "textColor": "#075985",
+          "fontSize": 14
+        }
+      }
+    },
+    {
+      "id": "dispo-1",
+      "type": "question",
+      "position": { "x": 600, "y": 100 },
+      "data": {
+        "label": "Disponibilité",
+        "content": "Est-ce un bon moment pour parler de votre couverture santé actuelle ?",
+        "responses": [
+          { "id": "resp-oui", "text": "Oui", "value": "oui", "color": "#10b981", "targetNodeId": "present-1" },
+          { "id": "resp-non", "text": "Non", "value": "non", "color": "#ef4444", "targetNodeId": "end-1" }
+        ],
+        "style": {
+          "backgroundColor": "#ffffff",
+          "borderColor": "#9ca3af",
+          "borderWidth": 2,
+          "borderRadius": 8,
+          "textColor": "#111827",
+          "fontSize": 14
+        }
+      }
+    },
+    {
+      "id": "present-1",
+      "type": "paragraph",
+      "position": { "x": 950, "y": 100 },
+      "data": {
+        "label": "Présentation produit",
+        "content": "Nous proposons une assurance santé qui couvre jusqu’à 80% de vos frais médicaux, avec des tarifs adaptés à votre situation familiale.",
+        "style": {
+          "backgroundColor": "#ecfdf5",
+          "borderColor": "#34d399",
+          "borderWidth": 2,
+          "borderRadius": 8,
+          "textColor": "#065f46",
+          "fontSize": 14
+        }
+      }
+    },
+    {
+      "id": "besoin-1",
+      "type": "question",
+      "position": { "x": 1300, "y": 100 },
+      "data": {
+        "label": "Besoin client",
+        "content": "Quelle est aujourd’hui votre principale préoccupation : le prix, la couverture ou la rapidité de remboursement ?",
+        "responses": [
+          { "id": "resp-prix", "text": "Prix", "value": "prix", "color": "#3b82f6", "targetNodeId": "argument-1" },
+          { "id": "resp-couverture", "text": "Couverture", "value": "couverture", "color": "#10b981", "targetNodeId": "argument-1" },
+          { "id": "resp-rapidite", "text": "Remboursement rapide", "value": "rapidite", "color": "#f59e0b", "targetNodeId": "argument-1" }
+        ],
+        "style": {
+          "backgroundColor": "#ffffff",
+          "borderColor": "#9ca3af",
+          "borderWidth": 2,
+          "borderRadius": 8,
+          "textColor": "#111827",
+          "fontSize": 14
+        }
+      }
+    },
+    {
+      "id": "argument-1",
+      "type": "paragraph",
+      "position": { "x": 1650, "y": 100 },
+      "data": {
+        "label": "Argumentaire",
+        "content": "Notre offre s’adapte précisément à votre besoin prioritaire, et nous avons des clients satisfaits qui ont économisé jusqu’à 40% sur leurs dépenses santé.",
+        "style": {
+          "backgroundColor": "#fff7ed",
+          "borderColor": "#f97316",
+          "borderWidth": 2,
+          "borderRadius": 8,
+          "textColor": "#7c2d12",
+          "fontSize": 14
+        }
+      }
+    },
+    {
+      "id": "validation-1",
+      "type": "question",
+      "position": { "x": 2000, "y": 100 },
+      "data": {
+        "label": "Validation",
+        "content": "Souhaitez-vous que nous procédions à une simulation gratuite de votre cotisation ?",
+        "responses": [
+          { "id": "val-oui", "text": "Oui", "value": "oui", "color": "#10b981", "targetNodeId": "end-1" },
+          { "id": "val-non", "text": "Non", "value": "non", "color": "#ef4444", "targetNodeId": "end-1" }
+        ],
+        "style": {
+          "backgroundColor": "#ffffff",
+          "borderColor": "#9ca3af",
+          "borderWidth": 2,
+          "borderRadius": 8,
+          "textColor": "#111827",
+          "fontSize": 14
+        }
+      }
+    },
+    {
+      "id": "end-1",
+      "type": "end",
+      "position": { "x": 2300, "y": 100 },
+      "data": {
+        "label": "Fin",
+        "content": "Merci pour votre temps. Bonne journée !",
+        "style": {
+          "backgroundColor": "#fef2f2",
+          "borderColor": "#f87171",
+          "borderWidth": 2,
+          "borderRadius": 8,
+          "textColor": "#7f1d1d",
+          "fontSize": 14
+        }
+      }
+    }
+  ],
+  "edges": [
+    { "id": "e1", "source": "start-1", "target": "intro-1" },
+    { "id": "e2", "source": "intro-1", "target": "dispo-1" },
+    { "id": "e3", "source": "dispo-1", "target": "present-1", "responseId": "resp-oui" },
+    { "id": "e4", "source": "dispo-1", "target": "end-1", "responseId": "resp-non" },
+    { "id": "e5", "source": "present-1", "target": "besoin-1" },
+    { "id": "e6", "source": "besoin-1", "target": "argument-1" },
+    { "id": "e7", "source": "argument-1", "target": "validation-1" },
+    { "id": "e8", "source": "validation-1", "target": "end-1" }
+  ],
+  "variables": [],
+  "createdAt": "2025-09-09T14:30:00.000Z",
+  "updatedAt": "2025-09-09T14:30:00.000Z"
+}

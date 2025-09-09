@@ -1,0 +1,164 @@
+{
+    "id": "workflow-recouvrement",
+    "name": "Workflow Recouvrement de Paiement",
+    "description": "Script d’appel pour le recouvrement de factures impayées.",
+    "nodes": [
+      {
+        "id": "start-4",
+        "type": "start",
+        "position": { "x": 100, "y": 50 },
+        "data": {
+          "label": "Début",
+          "content": "Début de l'appel",
+          "style": {
+            "backgroundColor": "#ffffff",
+            "borderColor": "#e5e7eb",
+            "borderWidth": 2,
+            "borderRadius": 8,
+            "textColor": "#2563eb",
+            "fontSize": 14
+          }
+        }
+      },
+      {
+        "id": "intro-4",
+        "type": "paragraph",
+        "position": { "x": 300, "y": 50 },
+        "data": {
+          "label": "Introduction",
+          "content": "Bonjour, je suis [Prénom] du service recouvrement de [Entreprise]. Je vous contacte concernant votre facture en attente.",
+          "style": {
+            "backgroundColor": "#f9fafb",
+            "borderColor": "#d1d5db",
+            "borderWidth": 2,
+            "borderRadius": 8,
+            "textColor": "#111827",
+            "fontSize": 14
+          }
+        }
+      },
+      {
+        "id": "question-dispo",
+        "type": "question",
+        "position": { "x": 600, "y": 50 },
+        "data": {
+          "label": "Vérification",
+          "content": "Est-ce un bon moment pour en discuter ?",
+          "responses": [
+            { "id": "q1-yes", "text": "Oui", "value": "oui", "targetNodeId": "info-facture", "color": "#16a34a" },
+            { "id": "q1-no", "text": "Non", "value": "non", "targetNodeId": "relance", "color": "#dc2626" }
+          ],
+          "style": {
+            "backgroundColor": "#ffffff",
+            "borderColor": "#e5e7eb",
+            "borderWidth": 2,
+            "borderRadius": 8,
+            "textColor": "#374151",
+            "fontSize": 14
+          }
+        }
+      },
+      {
+        "id": "relance",
+        "type": "paragraph",
+        "position": { "x": 900, "y": 150 },
+        "data": {
+          "label": "Relance",
+          "content": "Je comprends, je vous rappellerai à un moment plus opportun. Bonne journée.",
+          "style": {
+            "backgroundColor": "#fef2f2",
+            "borderColor": "#f87171",
+            "borderWidth": 2,
+            "borderRadius": 8,
+            "textColor": "#7f1d1d",
+            "fontSize": 14
+          }
+        }
+      },
+      {
+        "id": "info-facture",
+        "type": "paragraph",
+        "position": { "x": 900, "y": 50 },
+        "data": {
+          "label": "Détails Facture",
+          "content": "Votre facture n°[XXXX] d’un montant de [XXX €] est en attente depuis le [date].",
+          "style": {
+            "backgroundColor": "#f3f4f6",
+            "borderColor": "#9ca3af",
+            "borderWidth": 2,
+            "borderRadius": 8,
+            "textColor": "#111827",
+            "fontSize": 14
+          }
+        }
+      },
+      {
+        "id": "proposition-paiement",
+        "type": "question",
+        "position": { "x": 1200, "y": 50 },
+        "data": {
+          "label": "Proposition",
+          "content": "Souhaitez-vous régler la facture dès aujourd’hui ?",
+          "responses": [
+            { "id": "pay-yes", "text": "Oui", "value": "oui", "targetNodeId": "merci-paiement", "color": "#16a34a" },
+            { "id": "pay-no", "text": "Non", "value": "non", "targetNodeId": "negociation", "color": "#f59e0b" }
+          ],
+          "style": {
+            "backgroundColor": "#ffffff",
+            "borderColor": "#e5e7eb",
+            "borderWidth": 2,
+            "borderRadius": 8,
+            "textColor": "#374151",
+            "fontSize": 14
+          }
+        }
+      },
+      {
+        "id": "negociation",
+        "type": "paragraph",
+        "position": { "x": 1500, "y": 150 },
+        "data": {
+          "label": "Négociation",
+          "content": "Nous pouvons vous proposer un échéancier adapté pour faciliter le règlement.",
+          "style": {
+            "backgroundColor": "#fefce8",
+            "borderColor": "#facc15",
+            "borderWidth": 2,
+            "borderRadius": 8,
+            "textColor": "#78350f",
+            "fontSize": 14
+          }
+        }
+      },
+      {
+        "id": "merci-paiement",
+        "type": "end",
+        "position": { "x": 1500, "y": 50 },
+        "data": {
+          "label": "Fin",
+          "content": "Merci beaucoup pour votre règlement, nous restons à votre disposition.",
+          "style": {
+            "backgroundColor": "#ecfdf5",
+            "borderColor": "#34d399",
+            "borderWidth": 2,
+            "borderRadius": 8,
+            "textColor": "#065f46",
+            "fontSize": 14
+          }
+        }
+      }
+    ],
+    "edges": [
+      { "id": "e1", "source": "start-4", "target": "intro-4" },
+      { "id": "e2", "source": "intro-4", "target": "question-dispo" },
+      { "id": "e3", "source": "question-dispo", "target": "info-facture", "responseId": "q1-yes" },
+      { "id": "e4", "source": "question-dispo", "target": "relance", "responseId": "q1-no" },
+      { "id": "e5", "source": "info-facture", "target": "proposition-paiement" },
+      { "id": "e6", "source": "proposition-paiement", "target": "merci-paiement", "responseId": "pay-yes" },
+      { "id": "e7", "source": "proposition-paiement", "target": "negociation", "responseId": "pay-no" }
+    ],
+    "variables": [],
+    "createdAt": "2025-09-09T15:00:00.000Z",
+    "updatedAt": "2025-09-09T15:00:00.000Z"
+  }
+  

@@ -1,0 +1,147 @@
+{
+    "id": "workflow-prospection",
+    "name": "Workflow Prospection B2B",
+    "description": "Script d’appel pour la prospection de nouveaux clients entreprises.",
+    "nodes": [
+      {
+        "id": "start-5",
+        "type": "start",
+        "position": { "x": 100, "y": 50 },
+        "data": {
+          "label": "Début",
+          "content": "Début de l'appel",
+          "style": {
+            "backgroundColor": "#ffffff",
+            "borderColor": "#e5e7eb",
+            "borderWidth": 2,
+            "borderRadius": 8,
+            "textColor": "#2563eb",
+            "fontSize": 14
+          }
+        }
+      },
+      {
+        "id": "intro-5",
+        "type": "paragraph",
+        "position": { "x": 300, "y": 50 },
+        "data": {
+          "label": "Introduction",
+          "content": "Bonjour, je suis [Prénom] de [Entreprise]. Nous aidons les entreprises comme la vôtre à [bénéfice principal].",
+          "style": {
+            "backgroundColor": "#f9fafb",
+            "borderColor": "#d1d5db",
+            "borderWidth": 2,
+            "borderRadius": 8,
+            "textColor": "#111827",
+            "fontSize": 14
+          }
+        }
+      },
+      {
+        "id": "question-interet",
+        "type": "question",
+        "position": { "x": 600, "y": 50 },
+        "data": {
+          "label": "Qualification",
+          "content": "Seriez-vous intéressé par une solution qui [résout un problème précis] ?",
+          "responses": [
+            { "id": "pros-yes", "text": "Oui", "value": "oui", "targetNodeId": "proposition-demo", "color": "#16a34a" },
+            { "id": "pros-no", "text": "Non", "value": "non", "targetNodeId": "merci-temps", "color": "#dc2626" }
+          ],
+          "style": {
+            "backgroundColor": "#ffffff",
+            "borderColor": "#e5e7eb",
+            "borderWidth": 2,
+            "borderRadius": 8,
+            "textColor": "#374151",
+            "fontSize": 14
+          }
+        }
+      },
+      {
+        "id": "proposition-demo",
+        "type": "paragraph",
+        "position": { "x": 900, "y": 50 },
+        "data": {
+          "label": "Proposition",
+          "content": "Nous proposons une démonstration gratuite afin de vous montrer comment notre solution peut vous aider.",
+          "style": {
+            "backgroundColor": "#ecfdf5",
+            "borderColor": "#34d399",
+            "borderWidth": 2,
+            "borderRadius": 8,
+            "textColor": "#065f46",
+            "fontSize": 14
+          }
+        }
+      },
+      {
+        "id": "rdv",
+        "type": "question",
+        "position": { "x": 1200, "y": 50 },
+        "data": {
+          "label": "Prise de rendez-vous",
+          "content": "Souhaitez-vous que nous planifiions une démonstration cette semaine ?",
+          "responses": [
+            { "id": "rdv-yes", "text": "Oui", "value": "oui", "targetNodeId": "merci-rdv", "color": "#16a34a" },
+            { "id": "rdv-no", "text": "Non", "value": "non", "targetNodeId": "merci-temps", "color": "#f59e0b" }
+          ],
+          "style": {
+            "backgroundColor": "#ffffff",
+            "borderColor": "#e5e7eb",
+            "borderWidth": 2,
+            "borderRadius": 8,
+            "textColor": "#374151",
+            "fontSize": 14
+          }
+        }
+      },
+      {
+        "id": "merci-rdv",
+        "type": "end",
+        "position": { "x": 1500, "y": 50 },
+        "data": {
+          "label": "Fin RDV",
+          "content": "Parfait, nous avons planifié votre démonstration. Merci pour votre intérêt !",
+          "style": {
+            "backgroundColor": "#ecfdf5",
+            "borderColor": "#34d399",
+            "borderWidth": 2,
+            "borderRadius": 8,
+            "textColor": "#065f46",
+            "fontSize": 14
+          }
+        }
+      },
+      {
+        "id": "merci-temps",
+        "type": "end",
+        "position": { "x": 900, "y": 150 },
+        "data": {
+          "label": "Fin",
+          "content": "Merci pour votre temps. Nous restons disponibles si vos besoins évoluent.",
+          "style": {
+            "backgroundColor": "#fef2f2",
+            "borderColor": "#f87171",
+            "borderWidth": 2,
+            "borderRadius": 8,
+            "textColor": "#7f1d1d",
+            "fontSize": 14
+          }
+        }
+      }
+    ],
+    "edges": [
+      { "id": "e1", "source": "start-5", "target": "intro-5" },
+      { "id": "e2", "source": "intro-5", "target": "question-interet" },
+      { "id": "e3", "source": "question-interet", "target": "proposition-demo", "responseId": "pros-yes" },
+      { "id": "e4", "source": "question-interet", "target": "merci-temps", "responseId": "pros-no" },
+      { "id": "e5", "source": "proposition-demo", "target": "rdv" },
+      { "id": "e6", "source": "rdv", "target": "merci-rdv", "responseId": "rdv-yes" },
+      { "id": "e7", "source": "rdv", "target": "merci-temps", "responseId": "rdv-no" }
+    ],
+    "variables": [],
+    "createdAt": "2025-09-09T15:10:00.000Z",
+    "updatedAt": "2025-09-09T15:10:00.000Z"
+  }
+  

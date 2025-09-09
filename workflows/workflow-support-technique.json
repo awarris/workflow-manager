@@ -1,0 +1,144 @@
+{
+  "id": "workflow-support-technique",
+  "name": "Support Technique SAV",
+  "description": "Workflow pour accompagner un client ayant un problème technique.",
+  "nodes": [
+    {
+      "id": "start-2",
+      "type": "start",
+      "position": { "x": 50, "y": 100 },
+      "data": {
+        "label": "Début",
+        "content": "Appel SAV - Assistance technique",
+        "style": {
+          "backgroundColor": "#ffffff",
+          "borderColor": "#2563eb",
+          "borderWidth": 2,
+          "borderRadius": 8,
+          "textColor": "#2563eb",
+          "fontSize": 14
+        }
+      }
+    },
+    {
+      "id": "intro-2",
+      "type": "text",
+      "position": { "x": 300, "y": 100 },
+      "data": {
+        "label": "Accueil",
+        "content": "Bonjour, ici le service technique [ENTREPRISE]. Pouvez-vous me décrire brièvement votre problème ?",
+        "style": {
+          "backgroundColor": "#f0f9ff",
+          "borderColor": "#0284c7",
+          "borderWidth": 2,
+          "borderRadius": 8,
+          "textColor": "#075985",
+          "fontSize": 14
+        }
+      }
+    },
+    {
+      "id": "type-prob",
+      "type": "question",
+      "position": { "x": 600, "y": 100 },
+      "data": {
+        "label": "Type de problème",
+        "content": "Quel est le type de problème rencontré ?",
+        "responses": [
+          { "id": "pb-connexion", "text": "Connexion Internet", "value": "connexion", "color": "#3b82f6", "targetNodeId": "solution-connexion" },
+          { "id": "pb-appareil", "text": "Appareil défectueux", "value": "appareil", "color": "#f59e0b", "targetNodeId": "solution-appareil" },
+          { "id": "pb-facture", "text": "Facturation", "value": "facture", "color": "#10b981", "targetNodeId": "solution-facture" }
+        ],
+        "style": {
+          "backgroundColor": "#ffffff",
+          "borderColor": "#9ca3af",
+          "borderWidth": 2,
+          "borderRadius": 8,
+          "textColor": "#111827",
+          "fontSize": 14
+        }
+      }
+    },
+    {
+      "id": "solution-connexion",
+      "type": "paragraph",
+      "position": { "x": 950, "y": 50 },
+      "data": {
+        "label": "Solution Connexion",
+        "content": "Merci, nous allons vérifier ensemble vos paramètres de connexion et redémarrer votre box si nécessaire.",
+        "style": {
+          "backgroundColor": "#ecfdf5",
+          "borderColor": "#34d399",
+          "borderWidth": 2,
+          "borderRadius": 8,
+          "textColor": "#065f46",
+          "fontSize": 14
+        }
+      }
+    },
+    {
+      "id": "solution-appareil",
+      "type": "paragraph",
+      "position": { "x": 950, "y": 150 },
+      "data": {
+        "label": "Solution Appareil",
+        "content": "Nous allons tester l’appareil avec vous et prévoir un remplacement si le problème persiste.",
+        "style": {
+          "backgroundColor": "#fff7ed",
+          "borderColor": "#f97316",
+          "borderWidth": 2,
+          "borderRadius": 8,
+          "textColor": "#7c2d12",
+          "fontSize": 14
+        }
+      }
+    },
+    {
+      "id": "solution-facture",
+      "type": "paragraph",
+      "position": { "x": 950, "y": 250 },
+      "data": {
+        "label": "Solution Facturation",
+        "content": "Je vais analyser votre facture et vérifier s’il y a eu une erreur de calcul ou un service facturé par erreur.",
+        "style": {
+          "backgroundColor": "#fefce8",
+          "borderColor": "#eab308",
+          "borderWidth": 2,
+          "borderRadius": 8,
+          "textColor": "#78350f",
+          "fontSize": 14
+        }
+      }
+    },
+    {
+      "id": "end-2",
+      "type": "end",
+      "position": { "x": 1300, "y": 150 },
+      "data": {
+        "label": "Fin",
+        "content": "Merci de nous avoir contactés. Nous restons disponibles 7j/7 au besoin.",
+        "style": {
+          "backgroundColor": "#fef2f2",
+          "borderColor": "#f87171",
+          "borderWidth": 2,
+          "borderRadius": 8,
+          "textColor": "#7f1d1d",
+          "fontSize": 14
+        }
+      }
+    }
+  ],
+  "edges": [
+    { "id": "e1", "source": "start-2", "target": "intro-2" },
+    { "id": "e2", "source": "intro-2", "target": "type-prob" },
+    { "id": "e3", "source": "type-prob", "target": "solution-connexion", "responseId": "pb-connexion" },
+    { "id": "e4", "source": "type-prob", "target": "solution-appareil", "responseId": "pb-appareil" },
+    { "id": "e5", "source": "type-prob", "target": "solution-facture", "responseId": "pb-facture" },
+    { "id": "e6", "source": "solution-connexion", "target": "end-2" },
+    { "id": "e7", "source": "solution-appareil", "target": "end-2" },
+    { "id": "e8", "source": "solution-facture", "target": "end-2" }
+  ],
+  "variables": [],
+  "createdAt": "2025-09-09T14:35:00.000Z",
+  "updatedAt": "2025-09-09T14:35:00.000Z"
+}
