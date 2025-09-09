@@ -3,39 +3,41 @@ import { v4 as uuidv4 } from 'uuid';
 import { WorkflowState, Workflow, WorkflowNode, WorkflowEdge, ResponseOption, ConditionRule, WorkflowVariable } from '../types/workflow';
 
 interface WorkflowStore extends WorkflowState {
-  // Workflow management
+  // Gestion des workflows
   createWorkflow: (name: string, description: string) => string;
   deleteWorkflow: (id: string) => void;
   updateWorkflow: (id: string, updates: Partial<Workflow>) => void;
   setCurrentWorkflow: (id: string | null) => void;
-  
-  // Node management
+  publishWorkflow: (id: string) => string | undefined; // Ajout de la fonction de publication
+  getWorkflowByPublishedId: (publishedId: string) => Workflow | undefined; // Ajout du getter
+
+  // Gestion des nœuds
   addNode: (type: WorkflowNode['type'], position: { x: number; y: number }) => void;
   updateNode: (id: string, updates: Partial<WorkflowNode>) => void;
   deleteNode: (id: string) => void;
   setSelectedNode: (id: string | null) => void;
   
-  // Edge management
+  // Gestion des arêtes
   addEdge: (edge: WorkflowEdge) => void;
   updateEdge: (id: string, updates: Partial<WorkflowEdge>) => void;
   deleteEdge: (id: string) => void;
   
-  // Response management
+  // Gestion des réponses
   addResponse: (nodeId: string, response: Omit<ResponseOption, 'id'>) => void;
   updateResponse: (nodeId: string, responseId: string, updates: Partial<ResponseOption>) => void;
   deleteResponse: (nodeId: string, responseId: string) => void;
   
-  // Condition management
+  // Gestion des conditions
   addCondition: (nodeId: string, condition: Omit<ConditionRule, 'id'>) => void;
   updateCondition: (nodeId: string, conditionId: string, updates: Partial<ConditionRule>) => void;
   deleteCondition: (nodeId: string, conditionId: string) => void;
   
-  // Variable management
+  // Gestion des variables
   addVariable: (variable: Omit<WorkflowVariable, 'id'>) => void;
   updateVariable: (id: string, updates: Partial<WorkflowVariable>) => void;
   deleteVariable: (id: string) => void;
   
-  // Preview mode
+  // Mode prévisualisation
   setPreviewMode: (enabled: boolean) => void;
   clearChatMessages: () => void;
   setChatVariable: (name: string, value: any) => void;
@@ -157,6 +159,26 @@ export const useWorkflows = create<WorkflowStore>((set, get) => ({
   setCurrentWorkflow: (id: string | null) => {
     set({ currentWorkflow: id, selectedNode: null, isPreviewMode: false, chatVariables: {} });
   },
+   // Nouvelle fonction pour publier un workflow
+  publishWorkflow: (id: string) => {
+    const publishedId = uuidv4();
+    set((state) => ({
+      workflows: state.workflows.map((w) =>
+        w.id === id
+          ? { ...w, publishedId, updatedAt: new Date() }
+          : w
+      ),
+    }));
+    return publishedId;
+  },
+
+  // Nouvelle fonction pour récupérer un workflow par son ID de publication
+  getWorkflowByPublishedId: (publishedId: string) => {
+    const { workflows } = get();
+    console.log('voici les workflows: ', workflows);
+    return workflows.find(w => w.publishedId === publishedId);
+  },
+
 
   addNode: (type: WorkflowNode['type'], position: { x: number; y: number }) => {
     const { currentWorkflow, workflows } = get();

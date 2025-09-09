@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useRef, useState } from 'react'; // Ajout de useState
 import {
   ReactFlow,
   Background,
@@ -32,7 +32,10 @@ import {
   Variable,
   Image,
   MousePointer,
-  MoreHorizontal
+  MoreHorizontal,
+  Share2, // Nouvelle icône
+  Copy,   // Nouvelle icône
+  Check   // Nouvelle icône
 } from 'lucide-react';
 
 const nodeTypeOptions = [
@@ -64,20 +67,45 @@ export const WorkflowEditor: React.FC = () => {
     setSelectedNode,
     setPreviewMode,
     exportWorkflow,
+    publishWorkflow ,
     importWorkflow,
   } = useWorkflows();
 
   const currentWorkflowData = workflows.find(w => w.id === currentWorkflow);
   const [nodes, setNodes, onNodesChange] = useNodesState(currentWorkflowData?.nodes || []);
   const [edges, setEdges, onEdgesChange] = useEdgesState(currentWorkflowData?.edges || []);
+  const [publishedLink, setPublishedLink] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   // Update local state when workflow changes
   React.useEffect(() => {
     if (currentWorkflowData) {
       setNodes(currentWorkflowData.nodes);
       setEdges(currentWorkflowData.edges);
+      // Met à jour le lien publié si il existe déjà
+      if (currentWorkflowData.publishedId) {
+        setPublishedLink(`${window.location.origin}/preview/${currentWorkflowData.publishedId}`);
+      } else {
+        setPublishedLink(null);
+      }
     }
   }, [currentWorkflowData, setNodes, setEdges]);
+
+   const handlePublish = () => {
+    if (!currentWorkflow) return;
+    const publishedId = publishWorkflow(currentWorkflow);
+    if (publishedId) {
+      const link = `${window.location.origin}/preview/${publishedId}`;
+      setPublishedLink(link);
+    }
+  };
+
+  const handleCopyLink = () => {
+    if (!publishedLink) return;
+    navigator.clipboard.writeText(publishedLink);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const onConnect = useCallback((params: Connection | Edge) => {
     const newEdge = {
@@ -214,14 +242,40 @@ export const WorkflowEditor: React.FC = () => {
           
           {/* Actions */}
           <div className="flex gap-2 pt-3 border-t border-gray-200">
-            <button
-              onClick={() => setPreviewMode(true)}
-              className="flex items-center gap-2 px-3 py-2 text-sm bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg transition-all shadow-sm hover:shadow-md"
-            >
-              <Play size={14} />
-              Tester le bot
-            </button>
-            <button
+           <div className="flex gap-2">
+              <button
+                onClick={() => setPreviewMode(true)}
+                className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg transition-all shadow-sm hover:shadow-md"
+              >
+                <Play size={14} />
+                Tester
+              </button>
+              <button
+                onClick={handlePublish}
+                className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-lg transition-all shadow-sm hover:shadow-md"
+              >
+                <Share2 size={14} />
+                Publier
+              </button>
+            </div>
+            {publishedLink && (
+              <div className="p-2 bg-gray-100 rounded-lg">
+                <label className="text-xs font-medium text-gray-600">Lien de partage :</label>
+                <div className="flex items-center gap-2 mt-1">
+                  <input 
+                    type="text" 
+                    readOnly 
+                    value={publishedLink} 
+                    className="w-full text-xs bg-white border border-gray-300 rounded px-2 py-1" 
+                  />
+                  <button onClick={handleCopyLink} className="p-1.5 bg-gray-200 hover:bg-gray-300 rounded">
+                    {copied ? <Check size={14} className="text-green-600" /> : <Copy size={14} />}
+                  </button>
+                </div>
+              </div>
+            )}
+            <div className="flex gap-2">
+             <button
               onClick={handleExport}
               className="flex items-center gap-2 px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
               title="Exporter le bot"
@@ -235,6 +289,7 @@ export const WorkflowEditor: React.FC = () => {
             >
               <Upload size={14} />
             </button>
+            </div>
           </div>
         </div>
 

@@ -82,6 +82,7 @@ export interface Workflow {
   variables: WorkflowVariable[];
   createdAt: Date;
   updatedAt: Date;
+  publishedId?: string; // Ajout du champ pour l'ID de publication
 }
 
 export interface WorkflowVariable {
